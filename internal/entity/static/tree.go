@@ -1,17 +1,16 @@
 package static
 
 import (
-	"simulation/internal/entity"
 	"simulation/internal/game/map/coordinate"
 )
 
 type Tree struct {
-	*entity.BaseEntity
+	*StaticEntity
 }
 
 func NewTree(c coordinate.Coordinate) *Tree {
 	return &Tree{
-		BaseEntity: entity.New(c),
+		StaticEntity: NewStaticEntity(c),
 	}
 }
 
