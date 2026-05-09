@@ -6,11 +6,11 @@ import (
 )
 
 type Tree struct {
-	entity.BaseEntity
+	*entity.BaseEntity
 }
 
-func NewTree(c coordinate.Coordinate) Tree {
-	return Tree{
+func NewTree(c coordinate.Coordinate) *Tree {
+	return &Tree{
 		BaseEntity: entity.New(c),
 	}
 }

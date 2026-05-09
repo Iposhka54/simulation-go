@@ -6,11 +6,11 @@ import (
 )
 
 type Grass struct {
-	entity.BaseEntity
+	*entity.BaseEntity
 }
 
-func NewGrass(c coordinate.Coordinate) Grass {
-	return Grass{
+func NewGrass(c coordinate.Coordinate) *Grass {
+	return &Grass{
 		BaseEntity: entity.New(c),
 	}
 }

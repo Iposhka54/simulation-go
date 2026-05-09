@@ -17,8 +17,8 @@ type BaseEntity struct {
 	coordinate coordinate.Coordinate
 }
 
-func New(c coordinate.Coordinate) BaseEntity {
-	return BaseEntity{coordinate: c}
+func New(c coordinate.Coordinate) *BaseEntity {
+	return &BaseEntity{coordinate: c}
 }
 
 func (e *BaseEntity) MakeMove(to coordinate.Coordinate) {

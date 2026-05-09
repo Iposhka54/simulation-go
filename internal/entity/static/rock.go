@@ -6,11 +6,11 @@ import (
 )
 
 type Rock struct {
-	entity.BaseEntity
+	*entity.BaseEntity
 }
 
-func NewRock(c coordinate.Coordinate) Rock {
-	return Rock{
+func NewRock(c coordinate.Coordinate) *Rock {
+	return &Rock{
 		BaseEntity: entity.New(c),
 	}
 }
