@@ -1,16 +1,12 @@
 package static
 
-import (
-	"simulation/internal/game/map/coordinate"
-)
-
 type Tree struct {
 	*StaticEntity
 }
 
-func NewTree(c coordinate.Coordinate) *Tree {
+func NewTree() *Tree {
 	return &Tree{
-		StaticEntity: NewStaticEntity(c),
+		StaticEntity: NewStaticEntity(),
 	}
 }
 

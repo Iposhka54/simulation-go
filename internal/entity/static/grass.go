@@ -1,16 +1,12 @@
 package static
 
-import (
-	"simulation/internal/game/map/coordinate"
-)
-
 type Grass struct {
 	*StaticEntity
 }
 
-func NewGrass(c coordinate.Coordinate) *Grass {
+func NewGrass() *Grass {
 	return &Grass{
-		StaticEntity: NewStaticEntity(c),
+		StaticEntity: NewStaticEntity(),
 	}
 }
 
