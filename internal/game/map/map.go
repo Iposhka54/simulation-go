@@ -51,8 +51,17 @@ func (m *Map) Area() int {
 	return m.height * m.width
 }
 
+func (m *Map) Get(x, y int) entity.Entity {
+	c := coordinate.New(x, y)
+	e, ok := m.entitiesByCoordinates[c]
+	if !ok {
+		return nil
+	}
+	return e
+}
+
 func (m *Map) IsValid(c coordinate.Coordinate) bool {
-	return c.X > 0 && c.X < m.width && c.Y > 0 && c.Y < m.height
+	return c.X >= 0 && c.X < m.width && c.Y >= 0 && c.Y < m.height
 }
 
 func (m *Map) validate(c coordinate.Coordinate) {
