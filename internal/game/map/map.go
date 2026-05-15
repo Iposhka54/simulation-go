@@ -9,8 +9,8 @@ import (
 type Map struct {
 	width                 int
 	height                int
-	entitiesByCoordinates map[coordinate.Coordinate]*entity.Entity
-	coordinateByEntities  map[*entity.Entity]coordinate.Coordinate
+	entitiesByCoordinates map[coordinate.Coordinate]entity.Entity
+	coordinateByEntities  map[entity.Entity]coordinate.Coordinate
 }
 
 func New(width, height int) Map {
@@ -18,17 +18,18 @@ func New(width, height int) Map {
 	return Map{
 		width:                 width,
 		height:                height,
-		entitiesByCoordinates: make(map[coordinate.Coordinate]*entity.Entity),
-		coordinateByEntities:  make(map[*entity.Entity]coordinate.Coordinate),
+		entitiesByCoordinates: make(map[coordinate.Coordinate]entity.Entity),
+		coordinateByEntities:  make(map[entity.Entity]coordinate.Coordinate),
 	}
 }
 
-func (m *Map) PlaceEntity(c coordinate.Coordinate, baseEntity *entity.BaseEntity) {
+func (m *Map) PlaceEntity(c coordinate.Coordinate, e entity.Entity) {
 	m.validate(c)
 	if !m.IsEmpty(c) {
-		panic("")
+		panic(fmt.Sprintf("cell %s is already occupied", c.String()))
 	}
-
+	m.entitiesByCoordinates[c] = e
+	m.coordinateByEntities[e] = c
 }
 
 func (m *Map) IsEmpty(c coordinate.Coordinate) bool {
@@ -46,8 +47,12 @@ func (m *Map) Height() int {
 	return m.height
 }
 
+func (m *Map) Area() int {
+	return m.height * m.width
+}
+
 func (m *Map) IsValid(c coordinate.Coordinate) bool {
-	return c.X >= 0 && c.X <= m.width && c.Y >= 0 && c.Y <= m.height
+	return c.X > 0 && c.X < m.width && c.Y > 0 && c.Y < m.height
 }
 
 func (m *Map) validate(c coordinate.Coordinate) {
