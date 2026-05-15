@@ -7,14 +7,15 @@ import (
 
 type Creature interface {
 	entity.Entity
-	MakeMove(m _map.Map)
+	MakeMove(m *_map.Map)
 	Hp() int
 	MaxHp() int
 	Speed() int
 	TakeDamage(damage int)
 	IsAlive() bool
-	Eat(m _map.Map)
+	Eat(m *_map.Map)
 }
+
 type BaseCreature struct {
 	*entity.BaseEntity
 	hp    int
@@ -31,7 +32,11 @@ func New(hp, maxHp, speed int) *BaseCreature {
 	}
 }
 
-func (bc *BaseCreature) MakeMove(m _map.Map) {
+func (bc *BaseCreature) MakeMove(m *_map.Map) {
+	panic("implement in subclasses")
+}
+
+func (bc *BaseCreature) Eat(m *_map.Map) {
 	panic("implement in subclasses")
 }
 

@@ -3,6 +3,7 @@ package herbivore
 import (
 	"simulation/internal/entity"
 	"simulation/internal/entity/creature"
+	_map "simulation/internal/game/map"
 )
 
 type Herbivore struct {
@@ -15,7 +16,8 @@ func New(hp, maxHp, speed int) *Herbivore {
 	}
 }
 
-func (h *Herbivore) MakeMove() {
+func (h *Herbivore) MakeMove(m *_map.Map) {
+	_ = m
 	//todo: 1-step randomly move
 }
 
