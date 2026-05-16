@@ -24,7 +24,6 @@ func main() {
 	turnActions := []action.Action{}
 
 	r := renderer.NewConsoleRenderer(renderer.EmptyCellGlyph, glyph_set.NewEmojiGlyphSet())
-	s := simulation.New(&worldMap, r, initActions, turnActions)
-
-	s.PrintSimulation()
+	s := simulation.New(&worldMap, DefaultDelayMs, r, initActions, turnActions)
+	s.StartSimulation()
 }
