@@ -33,5 +33,5 @@ func (cr *ConsoleRenderer) Render(worldMap *_map.Map) {
 		}
 		output.WriteString("\n")
 	}
-	print(output.String())
+	println(output.String())
 }
