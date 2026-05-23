@@ -1,6 +1,7 @@
 package main
 
 import (
+	"simulation/internal/app"
 	"simulation/internal/game/action"
 	_map "simulation/internal/game/map"
 	"simulation/internal/game/renderer"
@@ -25,5 +26,6 @@ func main() {
 
 	r := renderer.NewConsoleRenderer(renderer.EmptyCellGlyph, glyph_set.NewEmojiGlyphSet())
 	s := simulation.New(&worldMap, DefaultDelayMs, r, initActions, turnActions)
-	s.StartSimulation()
+	a := app.New(s)
+	a.Run()
 }
