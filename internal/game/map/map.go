@@ -10,7 +10,12 @@ type Map struct {
 	width                 int
 	height                int
 	entitiesByCoordinates map[coordinate.Coordinate]entity.Entity
-	coordinateByEntities  map[entity.Entity]coordinate.Coordinate
+	coordinateByEntityID  map[uint64]coordinate.Coordinate
+}
+
+type PositionedEntity struct {
+	Entity   entity.Entity
+	Position coordinate.Coordinate
 }
 
 func New(width, height int) Map {
@@ -19,7 +24,7 @@ func New(width, height int) Map {
 		width:                 width,
 		height:                height,
 		entitiesByCoordinates: make(map[coordinate.Coordinate]entity.Entity),
-		coordinateByEntities:  make(map[entity.Entity]coordinate.Coordinate),
+		coordinateByEntityID:  make(map[uint64]coordinate.Coordinate),
 	}
 }
 
@@ -29,7 +34,7 @@ func (m *Map) PlaceEntity(c coordinate.Coordinate, e entity.Entity) {
 		panic(fmt.Sprintf("cell %s is already occupied", c.String()))
 	}
 	m.entitiesByCoordinates[c] = e
-	m.coordinateByEntities[e] = c
+	m.coordinateByEntityID[e.ID()] = c
 }
 
 func (m *Map) IsEmpty(c coordinate.Coordinate) bool {
@@ -61,7 +66,7 @@ func (m *Map) Get(x, y int) entity.Entity {
 }
 
 func (m *Map) GetCoordinatesByEntity(e entity.Entity) coordinate.Coordinate {
-	coord, exists := m.coordinateByEntities[e]
+	coord, exists := m.coordinateByEntityID[e.ID()]
 	if !exists {
 		panic(fmt.Sprintf("Entity %v not found on the map", e))
 	}
@@ -82,7 +87,7 @@ func (m *Map) RemoveEntity(c coordinate.Coordinate) {
 	e := m.entitiesByCoordinates[c]
 
 	delete(m.entitiesByCoordinates, c)
-	delete(m.coordinateByEntities, e)
+	delete(m.coordinateByEntityID, e.ID())
 }
 
 func (m *Map) validate(c coordinate.Coordinate) {
