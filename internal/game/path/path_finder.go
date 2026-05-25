@@ -12,15 +12,12 @@ var directions = []coordinate.Coordinate{
 	{X: 1, Y: 0},
 }
 
-type HasAdjacentFood func(c coordinate.Coordinate) bool
+type HasAdjacentFood func(worldMap *_map.Map, c coordinate.Coordinate) bool
 
-type Finder struct {
-}
-
-func (f *Finder) Find(worldMap _map.Map,
+func Find(worldMap *_map.Map,
 	startPosition coordinate.Coordinate,
 	foodChecker HasAdjacentFood) []coordinate.Coordinate {
-	if foodChecker(startPosition) {
+	if foodChecker(worldMap, startPosition) {
 		return []coordinate.Coordinate{startPosition}
 	}
 
@@ -34,7 +31,7 @@ func (f *Finder) Find(worldMap _map.Map,
 		currentPosition := queue[0]
 		queue = queue[1:]
 
-		neighbors := findReachableNeighbors(worldMap, currentPosition)
+		neighbors := FindReachableNeighbors(worldMap, currentPosition)
 
 		for _, neighbor := range neighbors {
 			if visited[neighbor] {
@@ -43,7 +40,7 @@ func (f *Finder) Find(worldMap _map.Map,
 
 			parents[neighbor] = currentPosition
 
-			if foodChecker(neighbor) {
+			if foodChecker(worldMap, neighbor) {
 				return reconstructPath(neighbor, startPosition, parents)
 			}
 
@@ -54,9 +51,9 @@ func (f *Finder) Find(worldMap _map.Map,
 	return []coordinate.Coordinate{}
 }
 
-func findReachableNeighbors(worldMap _map.Map,
-	startPosition coordinate.Coordinate) []coordinate.Coordinate {
-	neighbors := getNeighbors(startPosition)
+func FindReachableNeighbors(worldMap *_map.Map,
+	position coordinate.Coordinate) []coordinate.Coordinate {
+	neighbors := getNeighbors(position)
 
 	filtered := neighbors[:0]
 
@@ -69,13 +66,13 @@ func findReachableNeighbors(worldMap _map.Map,
 	return filtered
 }
 
-func getNeighbors(startPosition coordinate.Coordinate) []coordinate.Coordinate {
+func getNeighbors(position coordinate.Coordinate) []coordinate.Coordinate {
 	var neighbors []coordinate.Coordinate
 
 	for _, dir := range directions {
 		neighbors = append(neighbors, coordinate.Coordinate{
-			X: startPosition.X + dir.X,
-			Y: startPosition.Y + dir.Y,
+			X: position.X + dir.X,
+			Y: position.Y + dir.Y,
 		})
 	}
 
