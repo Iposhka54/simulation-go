@@ -19,7 +19,7 @@ type Creature interface {
 	Die(m *_map.Map)
 	HasAdjacentFood(m *_map.Map) bool
 	EatAdjacentFood(m *_map.Map) bool
-	IsFoodAdjacent(m *_map.Map, c coordinate.Coordinate)
+	IsFoodAdjacent(m *_map.Map, c coordinate.Coordinate) bool
 }
 
 type BaseCreature struct {
@@ -41,6 +41,7 @@ func New(hp, maxHp, speed int) *BaseCreature {
 func (bc *BaseCreature) MakeMove(m *_map.Map) {
 	if !bc.IsAlive() {
 		bc.Die(m)
+		return
 	}
 
 	bc.moveRandomly(m)
@@ -51,6 +52,8 @@ func (bc *BaseCreature) moveRandomly(m *_map.Map) {
 	length := len(neighbors)
 	if length >= 1 {
 		i := rand.Intn(length)
+		position := bc.getCurrentPosition(m)
+		m.RemoveEntity(position)
 		m.PlaceEntity(neighbors[i], bc)
 		return
 	}
@@ -88,7 +91,7 @@ func (bc *BaseCreature) HasAdjacentFood(m *_map.Map) bool {
 	panic("implement in subclasses")
 }
 
-func (bc *BaseCreature) EatAdjacentFood(m *_map.Map) {
+func (bc *BaseCreature) EatAdjacentFood(m *_map.Map) bool {
 	panic("implement in subclasses")
 }
 

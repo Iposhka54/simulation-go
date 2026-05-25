@@ -22,7 +22,9 @@ func main() {
 		&action.SpawnAction{},
 	}
 
-	turnActions := []action.Action{}
+	turnActions := []action.Action{
+		&action.MoveAction{},
+	}
 
 	r := renderer.NewConsoleRenderer(renderer.EmptyCellGlyph, glyph_set.NewEmojiGlyphSet())
 	s := simulation.New(&worldMap, DefaultDelayMs, r, initActions, turnActions)

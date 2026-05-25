@@ -90,6 +90,19 @@ func (m *Map) RemoveEntity(c coordinate.Coordinate) {
 	delete(m.coordinateByEntityID, e.ID())
 }
 
+func (m *Map) GetPositionedEntities() []PositionedEntity {
+	positioned := make([]PositionedEntity, 0, len(m.entitiesByCoordinates))
+
+	for coord, e := range m.entitiesByCoordinates {
+		positioned = append(positioned, PositionedEntity{
+			Entity:   e,
+			Position: coord,
+		})
+	}
+
+	return positioned
+}
+
 func (m *Map) validate(c coordinate.Coordinate) {
 	if m.IsValid(c) {
 		return
