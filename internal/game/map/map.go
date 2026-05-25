@@ -64,6 +64,19 @@ func (m *Map) IsValid(c coordinate.Coordinate) bool {
 	return c.X >= 0 && c.X < m.width && c.Y >= 0 && c.Y < m.height
 }
 
+func (m *Map) RemoveEntity(c coordinate.Coordinate) {
+	m.validate(c)
+
+	if m.IsEmpty(c) {
+		panic(fmt.Sprintf("Cannot remove entity from %s because this coords is empty", c.String()))
+	}
+
+	e := m.entitiesByCoordinates[c]
+
+	delete(m.entitiesByCoordinates, c)
+	delete(m.coordinateByEntities, e)
+}
+
 func (m *Map) validate(c coordinate.Coordinate) {
 	if m.IsValid(c) {
 		return
