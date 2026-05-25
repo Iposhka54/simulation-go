@@ -14,10 +14,10 @@ var directions = []coordinate.Coordinate{
 
 type HasAdjacentFood func(c coordinate.Coordinate) bool
 
-type PathFinder struct {
+type Finder struct {
 }
 
-func (pf *PathFinder) Find(worldMap _map.Map,
+func (f *Finder) Find(worldMap _map.Map,
 	startPosition coordinate.Coordinate,
 	foodChecker HasAdjacentFood) []coordinate.Coordinate {
 	if foodChecker(startPosition) {
