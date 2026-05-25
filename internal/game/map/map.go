@@ -60,6 +60,14 @@ func (m *Map) Get(x, y int) entity.Entity {
 	return e
 }
 
+func (m *Map) GetCoordinatesByEntity(e entity.Entity) coordinate.Coordinate {
+	coord, exists := m.coordinateByEntities[e]
+	if !exists {
+		panic(fmt.Sprintf("Entity %v not found on the map", e))
+	}
+	return coord
+}
+
 func (m *Map) IsValid(c coordinate.Coordinate) bool {
 	return c.X >= 0 && c.X < m.width && c.Y >= 0 && c.Y < m.height
 }
