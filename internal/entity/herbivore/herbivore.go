@@ -1,7 +1,6 @@
 package herbivore
 
 import (
-	"simulation/internal/entity"
 	"simulation/internal/entity/creature"
 	_map "simulation/internal/game/map"
 )
@@ -19,8 +18,4 @@ func New(hp, maxHp, speed int) *Herbivore {
 func (h *Herbivore) MakeMove(m *_map.Map) {
 	_ = m
 	//todo: 1-step randomly move
-}
-
-func (h *Herbivore) Type() entity.EntityType {
-	return entity.TypeHerbivore
 }
