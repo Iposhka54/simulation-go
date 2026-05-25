@@ -88,14 +88,17 @@ func (bc *BaseCreature) Die(m *_map.Map) {
 }
 
 func (bc *BaseCreature) HasAdjacentFood(m *_map.Map) bool {
+	_ = m
 	panic("implement in subclasses")
 }
 
 func (bc *BaseCreature) EatAdjacentFood(m *_map.Map) bool {
+	_ = m
 	panic("implement in subclasses")
 }
 
 func (bc *BaseCreature) IsFoodAdjacent(m *_map.Map, c coordinate.Coordinate) bool {
+	_, _ = m, c
 	panic("implement in subclasses")
 }
 
