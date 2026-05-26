@@ -5,25 +5,25 @@ import (
 	"simulation/internal/game/map/coordinate"
 )
 
-var directions = []coordinate.Coordinate{
+var directions = []coordinate.Point{
 	{X: 0, Y: -1},
 	{X: 0, Y: 1},
 	{X: -1, Y: 0},
 	{X: 1, Y: 0},
 }
 
-type HasAdjacentFood func(worldMap *_map.Map, c coordinate.Coordinate) bool
+type HasAdjacentFood func(worldMap *_map.Map, c coordinate.Point) bool
 
 func Find(worldMap *_map.Map,
-	startPosition coordinate.Coordinate,
-	foodChecker HasAdjacentFood) []coordinate.Coordinate {
+	startPosition coordinate.Point,
+	foodChecker HasAdjacentFood) []coordinate.Point {
 	if foodChecker(worldMap, startPosition) {
-		return []coordinate.Coordinate{startPosition}
+		return []coordinate.Point{startPosition}
 	}
 
-	queue := []coordinate.Coordinate{startPosition}
-	visited := make(map[coordinate.Coordinate]bool)
-	parents := make(map[coordinate.Coordinate]coordinate.Coordinate)
+	queue := []coordinate.Point{startPosition}
+	visited := make(map[coordinate.Point]bool)
+	parents := make(map[coordinate.Point]coordinate.Point)
 
 	visited[startPosition] = true
 
@@ -49,11 +49,11 @@ func Find(worldMap *_map.Map,
 		}
 	}
 
-	return []coordinate.Coordinate{}
+	return []coordinate.Point{}
 }
 
 func FindReachableNeighbors(worldMap *_map.Map,
-	position coordinate.Coordinate) []coordinate.Coordinate {
+	position coordinate.Point) []coordinate.Point {
 	neighbors := GetNeighbors(position)
 
 	filtered := neighbors[:0]
@@ -67,11 +67,11 @@ func FindReachableNeighbors(worldMap *_map.Map,
 	return filtered
 }
 
-func GetNeighbors(position coordinate.Coordinate) []coordinate.Coordinate {
-	var neighbors []coordinate.Coordinate
+func GetNeighbors(position coordinate.Point) []coordinate.Point {
+	var neighbors []coordinate.Point
 
 	for _, dir := range directions {
-		neighbors = append(neighbors, coordinate.Coordinate{
+		neighbors = append(neighbors, coordinate.Point{
 			X: position.X + dir.X,
 			Y: position.Y + dir.Y,
 		})
@@ -80,14 +80,14 @@ func GetNeighbors(position coordinate.Coordinate) []coordinate.Coordinate {
 	return neighbors
 }
 
-func reconstructPath(goalCord, startCord coordinate.Coordinate,
-	parents map[coordinate.Coordinate]coordinate.Coordinate) []coordinate.Coordinate {
-	path := []coordinate.Coordinate{goalCord}
+func reconstructPath(goalCord, startCord coordinate.Point,
+	parents map[coordinate.Point]coordinate.Point) []coordinate.Point {
+	path := []coordinate.Point{goalCord}
 
 	currentCord := goalCord
 	for currentCord != startCord {
 		currentCord = parents[currentCord]
-		path = append([]coordinate.Coordinate{currentCord}, path...)
+		path = append([]coordinate.Point{currentCord}, path...)
 	}
 
 	return path

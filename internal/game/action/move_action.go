@@ -29,7 +29,7 @@ func (ma *MoveAction) Execute(worldMap *_map.Map) {
 	}
 }
 
-func isStillAtPosition(worldMap *_map.Map, position coordinate.Coordinate, creature creature.Creature) bool {
+func isStillAtPosition(worldMap *_map.Map, position coordinate.Point, creature creature.Creature) bool {
 	entity := worldMap.Get(position.X, position.Y)
 	if entity == nil {
 		return false

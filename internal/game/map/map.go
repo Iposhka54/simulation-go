@@ -9,13 +9,13 @@ import (
 type Map struct {
 	width                 int
 	height                int
-	entitiesByCoordinates map[coordinate.Coordinate]entity.Entity
-	coordinateByEntityID  map[uint64]coordinate.Coordinate
+	entitiesByCoordinates map[coordinate.Point]entity.Entity
+	coordinateByEntityID  map[uint64]coordinate.Point
 }
 
 type PositionedEntity struct {
 	Entity   entity.Entity
-	Position coordinate.Coordinate
+	Position coordinate.Point
 }
 
 func New(width, height int) Map {
@@ -23,12 +23,12 @@ func New(width, height int) Map {
 	return Map{
 		width:                 width,
 		height:                height,
-		entitiesByCoordinates: make(map[coordinate.Coordinate]entity.Entity),
-		coordinateByEntityID:  make(map[uint64]coordinate.Coordinate),
+		entitiesByCoordinates: make(map[coordinate.Point]entity.Entity),
+		coordinateByEntityID:  make(map[uint64]coordinate.Point),
 	}
 }
 
-func (m *Map) PlaceEntity(c coordinate.Coordinate, e entity.Entity) {
+func (m *Map) PlaceEntity(c coordinate.Point, e entity.Entity) {
 	m.validate(c)
 	if !m.IsEmpty(c) {
 		panic(fmt.Sprintf("cell %s is already occupied", c.String()))
@@ -37,7 +37,7 @@ func (m *Map) PlaceEntity(c coordinate.Coordinate, e entity.Entity) {
 	m.coordinateByEntityID[e.ID()] = c
 }
 
-func (m *Map) IsEmpty(c coordinate.Coordinate) bool {
+func (m *Map) IsEmpty(c coordinate.Point) bool {
 	if _, exists := m.entitiesByCoordinates[c]; exists {
 		return false
 	}
@@ -65,7 +65,7 @@ func (m *Map) Get(x, y int) entity.Entity {
 	return e
 }
 
-func (m *Map) GetCoordinatesByEntity(e entity.Entity) coordinate.Coordinate {
+func (m *Map) GetCoordinatesByEntity(e entity.Entity) coordinate.Point {
 	coord, exists := m.coordinateByEntityID[e.ID()]
 	if !exists {
 		panic(fmt.Sprintf("Entity %v not found on the map", e))
@@ -73,11 +73,11 @@ func (m *Map) GetCoordinatesByEntity(e entity.Entity) coordinate.Coordinate {
 	return coord
 }
 
-func (m *Map) IsValid(c coordinate.Coordinate) bool {
+func (m *Map) IsValid(c coordinate.Point) bool {
 	return c.X >= 0 && c.X < m.width && c.Y >= 0 && c.Y < m.height
 }
 
-func (m *Map) RemoveEntity(c coordinate.Coordinate) {
+func (m *Map) RemoveEntity(c coordinate.Point) {
 	m.validate(c)
 
 	if m.IsEmpty(c) {
@@ -103,7 +103,7 @@ func (m *Map) GetPositionedEntities() []PositionedEntity {
 	return positioned
 }
 
-func (m *Map) validate(c coordinate.Coordinate) {
+func (m *Map) validate(c coordinate.Point) {
 	if m.IsValid(c) {
 		return
 	}

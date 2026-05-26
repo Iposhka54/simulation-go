@@ -2,18 +2,18 @@ package coordinate
 
 import "fmt"
 
-type Coordinate struct {
+type Point struct {
 	X int
 	Y int
 }
 
-func New(x, y int) Coordinate {
-	return Coordinate{
+func New(x, y int) Point {
+	return Point{
 		X: x,
 		Y: y,
 	}
 }
 
-func (c *Coordinate) String() string {
-	return fmt.Sprintf("Coords{X=%d, Y=%d}", c.X, c.Y)
+func (c *Point) String() string {
+	return fmt.Sprintf("Point{X=%d, Y=%d}", c.X, c.Y)
 }

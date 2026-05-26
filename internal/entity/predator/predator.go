@@ -44,7 +44,7 @@ func (p *Predator) EatAdjacentFood(m *_map.Map) bool {
 	return true
 }
 
-func (p *Predator) IsFoodAdjacent(m *_map.Map, c coordinate.Coordinate) bool {
+func (p *Predator) IsFoodAdjacent(m *_map.Map, c coordinate.Point) bool {
 	for _, neighbor := range path.GetNeighbors(c) {
 		if !m.IsValid(neighbor) {
 			continue
@@ -63,7 +63,7 @@ func (p *Predator) IsFoodAdjacent(m *_map.Map, c coordinate.Coordinate) bool {
 	return false
 }
 
-func (p *Predator) findAdjacentFood(m *_map.Map) (coordinate.Coordinate, creature.Creature, bool) {
+func (p *Predator) findAdjacentFood(m *_map.Map) (coordinate.Point, creature.Creature, bool) {
 	currentPosition := m.GetCoordinatesByEntity(p)
 	for _, neighbor := range path.GetNeighbors(currentPosition) {
 		if !m.IsValid(neighbor) {
@@ -83,7 +83,7 @@ func (p *Predator) findAdjacentFood(m *_map.Map) (coordinate.Coordinate, creatur
 		return neighbor, prey, true
 	}
 
-	return coordinate.Coordinate{}, nil, false
+	return coordinate.Point{}, nil, false
 }
 
 func isHerbivore(e entity.Entity) bool {

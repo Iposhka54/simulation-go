@@ -19,7 +19,7 @@ type Creature interface {
 	Die(m *_map.Map)
 	HasAdjacentFood(m *_map.Map) bool
 	EatAdjacentFood(m *_map.Map) bool
-	IsFoodAdjacent(m *_map.Map, c coordinate.Coordinate) bool
+	IsFoodAdjacent(m *_map.Map, c coordinate.Point) bool
 }
 
 type BaseCreature struct {
@@ -60,7 +60,7 @@ func (bc *BaseCreature) PerformMove(c Creature, m *_map.Map) {
 	bc.moveRandomly(m)
 }
 
-func (bc *BaseCreature) moveAlongPath(m *_map.Map, p []coordinate.Coordinate) {
+func (bc *BaseCreature) moveAlongPath(m *_map.Map, p []coordinate.Point) {
 	length := len(p)
 	if length <= 1 {
 		panic("Path must contain at least 2 positions")
@@ -85,7 +85,7 @@ func (bc *BaseCreature) moveRandomly(m *_map.Map) {
 	//todo need will log a situation where an entity cannot move
 }
 
-func (bc *BaseCreature) move(m *_map.Map, newPosition coordinate.Coordinate) {
+func (bc *BaseCreature) move(m *_map.Map, newPosition coordinate.Point) {
 	position := bc.getCurrentPosition(m)
 	movingEntity := m.Get(position.X, position.Y)
 	m.RemoveEntity(position)
@@ -129,11 +129,11 @@ func (bc *BaseCreature) EatAdjacentFood(m *_map.Map) bool {
 	panic("implement in subclasses")
 }
 
-func (bc *BaseCreature) IsFoodAdjacent(m *_map.Map, c coordinate.Coordinate) bool {
+func (bc *BaseCreature) IsFoodAdjacent(m *_map.Map, c coordinate.Point) bool {
 	_, _ = m, c
 	panic("implement in subclasses")
 }
 
-func (bc *BaseCreature) getCurrentPosition(m *_map.Map) coordinate.Coordinate {
+func (bc *BaseCreature) getCurrentPosition(m *_map.Map) coordinate.Point {
 	return m.GetCoordinatesByEntity(bc)
 }
