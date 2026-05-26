@@ -6,8 +6,8 @@ import (
 	"simulation/internal/entity/herbivore"
 	"simulation/internal/entity/predator"
 	"simulation/internal/entity/static"
-	_map "simulation/internal/game/map"
-	"simulation/internal/game/map/coordinate"
+	"simulation/internal/game/world"
+	"simulation/internal/game/world/coordinate"
 )
 
 const (
@@ -29,43 +29,43 @@ type Spawner func() entity.Entity
 
 type SpawnAction struct{}
 
-func (sa *SpawnAction) Execute(worldMap *_map.Map) {
-	area := worldMap.Area()
+func (sa *SpawnAction) Execute(world *world.World) {
+	area := world.Area()
 	maxAttempts := area * MaxPlacementAttemptsMultiplier
 
-	spawnMany(worldMap, area, PredatorDensityDivisor, maxAttempts, func() entity.Entity {
+	spawnMany(world, area, PredatorDensityDivisor, maxAttempts, func() entity.Entity {
 		return predator.NewWolf(InitialPredatorHp, InitialPredatorHp, PredatorSpeed, PredatorDamage)
 	})
-	spawnMany(worldMap, area, HerbivoreDensityDivisor, maxAttempts, func() entity.Entity {
+	spawnMany(world, area, HerbivoreDensityDivisor, maxAttempts, func() entity.Entity {
 		return herbivore.NewRabbit(InitialHerbivoreHp, InitialHerbivoreHp, InitialHerbivoreSpeed)
 	})
-	spawnMany(worldMap, area, RockDensityDivisor, maxAttempts, func() entity.Entity {
+	spawnMany(world, area, RockDensityDivisor, maxAttempts, func() entity.Entity {
 		return static.NewRock()
 	})
-	spawnMany(worldMap, area, TreeDensityDivisor, maxAttempts, func() entity.Entity {
+	spawnMany(world, area, TreeDensityDivisor, maxAttempts, func() entity.Entity {
 		return static.NewTree()
 	})
-	spawnMany(worldMap, area, GrassDensityDivisor, maxAttempts, func() entity.Entity {
+	spawnMany(world, area, GrassDensityDivisor, maxAttempts, func() entity.Entity {
 		return static.NewGrass()
 	})
 }
 
-func spawnMany(worldMap *_map.Map, area, divisor, maxAttempts int, spawner Spawner) {
+func spawnMany(world *world.World, area, divisor, maxAttempts int, spawner Spawner) {
 	entityCount := area / divisor
 	if entityCount < 1 {
 		entityCount = 1
 	}
 
-	spawnUpTo(worldMap, maxAttempts, entityCount, spawner)
+	spawnUpTo(world, maxAttempts, entityCount, spawner)
 }
 
-func spawnUpTo(worldMap *_map.Map, maxAttempts, entityCount int, spawner Spawner) {
+func spawnUpTo(world *world.World, maxAttempts, entityCount int, spawner Spawner) {
 	placed := 0
 	attempts := 0
 	for placed < entityCount && attempts < maxAttempts {
-		spawnPosition := coordinate.New(rand.Intn(worldMap.Width()), rand.Intn(worldMap.Height()))
-		if worldMap.IsEmpty(spawnPosition) {
-			worldMap.PlaceEntity(spawnPosition, spawner())
+		spawnPosition := coordinate.New(rand.Intn(world.Width()), rand.Intn(world.Height()))
+		if world.IsEmpty(spawnPosition) {
+			world.PlaceEntity(spawnPosition, spawner())
 			placed++
 		}
 		attempts++

@@ -1,8 +1,8 @@
 package renderer
 
 import (
-	_map "simulation/internal/game/map"
 	"simulation/internal/game/renderer/glyph_set"
+	"simulation/internal/game/world"
 	"strings"
 )
 
@@ -18,12 +18,12 @@ func NewConsoleRenderer(emptyCellGlyph string, glyphSet glyph_set.GlyphSet) *Con
 	}
 }
 
-func (cr *ConsoleRenderer) Render(worldMap *_map.Map) {
+func (cr *ConsoleRenderer) Render(world *world.World) {
 	output := strings.Builder{}
 
-	for y := 0; y < worldMap.Height(); y++ {
-		for x := 0; x < worldMap.Width(); x++ {
-			entity := worldMap.Get(x, y)
+	for y := 0; y < world.Height(); y++ {
+		for x := 0; x < world.Width(); x++ {
+			entity := world.Get(x, y)
 			if entity != nil {
 				output.WriteString(cr.glyphSet.GetGlyph(entity))
 			} else {

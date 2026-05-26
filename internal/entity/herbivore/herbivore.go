@@ -3,9 +3,9 @@ package herbivore
 import (
 	"simulation/internal/entity/creature"
 	"simulation/internal/entity/static"
-	_map "simulation/internal/game/map"
-	"simulation/internal/game/map/coordinate"
 	"simulation/internal/game/path"
+	"simulation/internal/game/world"
+	"simulation/internal/game/world/coordinate"
 )
 
 type Herbivore struct {
@@ -18,32 +18,32 @@ func New(hp, maxHp, speed int) *Herbivore {
 	}
 }
 
-func (h *Herbivore) MakeMove(m *_map.Map) {
-	h.BaseCreature.PerformMove(h, m)
+func (h *Herbivore) MakeMove(w *world.World) {
+	h.BaseCreature.PerformMove(h, w)
 }
 
-func (h *Herbivore) HasAdjacentFood(m *_map.Map) bool {
-	_, exists := h.findAdjacentFood(m)
+func (h *Herbivore) HasAdjacentFood(w *world.World) bool {
+	_, exists := h.findAdjacentFood(w)
 	return exists
 }
 
-func (h *Herbivore) EatAdjacentFood(m *_map.Map) bool {
-	foodPosition, exists := h.findAdjacentFood(m)
+func (h *Herbivore) EatAdjacentFood(w *world.World) bool {
+	foodPosition, exists := h.findAdjacentFood(w)
 	if !exists {
 		return false
 	}
 
-	m.RemoveEntity(foodPosition)
+	w.RemoveEntity(foodPosition)
 	return true
 }
 
-func (h *Herbivore) IsFoodAdjacent(m *_map.Map, c coordinate.Point) bool {
-	for _, neighbor := range path.GetNeighbors(c) {
-		if !m.IsValid(neighbor) {
+func (h *Herbivore) IsFoodAdjacent(w *world.World, p coordinate.Point) bool {
+	for _, neighbor := range path.GetNeighbors(p) {
+		if !w.IsValid(neighbor) {
 			continue
 		}
 
-		e := m.Get(neighbor.X, neighbor.Y)
+		e := w.Get(neighbor.X, neighbor.Y)
 		if e == nil {
 			continue
 		}
@@ -56,14 +56,14 @@ func (h *Herbivore) IsFoodAdjacent(m *_map.Map, c coordinate.Point) bool {
 	return false
 }
 
-func (h *Herbivore) findAdjacentFood(m *_map.Map) (coordinate.Point, bool) {
-	currentPosition := m.GetCoordinatesByEntity(h)
+func (h *Herbivore) findAdjacentFood(w *world.World) (coordinate.Point, bool) {
+	currentPosition := w.GetPointByEntity(h)
 	for _, neighbor := range path.GetNeighbors(currentPosition) {
-		if !m.IsValid(neighbor) {
+		if !w.IsValid(neighbor) {
 			continue
 		}
 
-		e := m.Get(neighbor.X, neighbor.Y)
+		e := w.Get(neighbor.X, neighbor.Y)
 		if e == nil {
 			continue
 		}

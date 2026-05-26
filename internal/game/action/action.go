@@ -1,7 +1,7 @@
 package action
 
-import _map "simulation/internal/game/map"
+import "simulation/internal/game/world"
 
 type Action interface {
-	Execute(worldMap *_map.Map)
+	Execute(world *world.World)
 }

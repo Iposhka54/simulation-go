@@ -1,11 +1,11 @@
 package renderer
 
-import _map "simulation/internal/game/map"
+import "simulation/internal/game/world"
 
 const (
 	EmptyCellGlyph = "⬛"
 )
 
 type Renderer interface {
-	Render(worldMap *_map.Map)
+	Render(world *world.World)
 }

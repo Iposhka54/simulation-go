@@ -2,14 +2,14 @@ package action
 
 import (
 	"simulation/internal/entity/creature"
-	_map "simulation/internal/game/map"
-	"simulation/internal/game/map/coordinate"
+	"simulation/internal/game/world"
+	"simulation/internal/game/world/coordinate"
 )
 
 type MoveAction struct{}
 
-func (ma *MoveAction) Execute(worldMap *_map.Map) {
-	positionedEntities := worldMap.GetPositionedEntities()
+func (ma *MoveAction) Execute(world *world.World) {
+	positionedEntities := world.GetPositionedEntities()
 
 	for _, positioned := range positionedEntities {
 		cr, ok := positioned.Entity.(creature.Creature)
@@ -21,16 +21,16 @@ func (ma *MoveAction) Execute(worldMap *_map.Map) {
 			continue
 		}
 
-		if !isStillAtPosition(worldMap, positioned.Position, cr) {
+		if !isStillAtPosition(world, positioned.Position, cr) {
 			continue
 		}
 
-		cr.MakeMove(worldMap)
+		cr.MakeMove(world)
 	}
 }
 
-func isStillAtPosition(worldMap *_map.Map, position coordinate.Point, creature creature.Creature) bool {
-	entity := worldMap.Get(position.X, position.Y)
+func isStillAtPosition(world *world.World, position coordinate.Point, creature creature.Creature) bool {
+	entity := world.Get(position.X, position.Y)
 	if entity == nil {
 		return false
 	}

@@ -2,14 +2,14 @@ package simulation
 
 import (
 	"simulation/internal/game/action"
-	_map "simulation/internal/game/map"
 	"simulation/internal/game/renderer"
+	"simulation/internal/game/world"
 	"time"
 )
 
 type Simulation struct {
 	turn        uint64
-	worldMap    *_map.Map
+	world       *world.World
 	renderer    renderer.Renderer
 	initActions []action.Action
 	turnActions []action.Action
@@ -20,10 +20,10 @@ type Simulation struct {
 	paused      bool
 }
 
-func New(worldMap *_map.Map, delayMs int, render renderer.Renderer, initActions, turnActions []action.Action) *Simulation {
+func New(world *world.World, delayMs int, render renderer.Renderer, initActions, turnActions []action.Action) *Simulation {
 	simulation := &Simulation{
 		turn:        0,
-		worldMap:    worldMap,
+		world:       world,
 		renderer:    render,
 		initActions: initActions,
 		turnActions: turnActions,
@@ -95,16 +95,16 @@ func (s *Simulation) Stop() {
 func (s *Simulation) nextTurn() {
 	s.turn++
 	for _, turnAction := range s.turnActions {
-		turnAction.Execute(s.worldMap)
+		turnAction.Execute(s.world)
 	}
 
 	s.printTurnHeader()
-	s.renderer.Render(s.worldMap)
+	s.renderer.Render(s.world)
 }
 
 func (s *Simulation) init() {
 	for _, initAction := range s.initActions {
-		initAction.Execute(s.worldMap)
+		initAction.Execute(s.world)
 	}
 }
 

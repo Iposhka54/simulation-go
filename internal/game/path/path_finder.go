@@ -1,8 +1,8 @@
 package path
 
 import (
-	_map "simulation/internal/game/map"
-	"simulation/internal/game/map/coordinate"
+	"simulation/internal/game/world"
+	"simulation/internal/game/world/coordinate"
 )
 
 var directions = []coordinate.Point{
@@ -12,12 +12,12 @@ var directions = []coordinate.Point{
 	{X: 1, Y: 0},
 }
 
-type HasAdjacentFood func(worldMap *_map.Map, c coordinate.Point) bool
+type HasAdjacentFood func(world *world.World, p coordinate.Point) bool
 
-func Find(worldMap *_map.Map,
+func Find(world *world.World,
 	startPosition coordinate.Point,
 	foodChecker HasAdjacentFood) []coordinate.Point {
-	if foodChecker(worldMap, startPosition) {
+	if foodChecker(world, startPosition) {
 		return []coordinate.Point{startPosition}
 	}
 
@@ -31,7 +31,7 @@ func Find(worldMap *_map.Map,
 		currentPosition := queue[0]
 		queue = queue[1:]
 
-		neighbors := FindReachableNeighbors(worldMap, currentPosition)
+		neighbors := FindReachableNeighbors(world, currentPosition)
 
 		for _, neighbor := range neighbors {
 			if visited[neighbor] {
@@ -41,7 +41,7 @@ func Find(worldMap *_map.Map,
 			visited[neighbor] = true
 			parents[neighbor] = currentPosition
 
-			if foodChecker(worldMap, neighbor) {
+			if foodChecker(world, neighbor) {
 				return reconstructPath(neighbor, startPosition, parents)
 			}
 
@@ -52,14 +52,14 @@ func Find(worldMap *_map.Map,
 	return []coordinate.Point{}
 }
 
-func FindReachableNeighbors(worldMap *_map.Map,
+func FindReachableNeighbors(world *world.World,
 	position coordinate.Point) []coordinate.Point {
 	neighbors := GetNeighbors(position)
 
 	filtered := neighbors[:0]
 
 	for _, neighbor := range neighbors {
-		if worldMap.IsValid(neighbor) && worldMap.IsEmpty(neighbor) {
+		if world.IsValid(neighbor) && world.IsEmpty(neighbor) {
 			filtered = append(filtered, neighbor)
 		}
 	}

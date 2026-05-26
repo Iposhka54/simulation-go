@@ -3,10 +3,10 @@ package main
 import (
 	"simulation/internal/app"
 	"simulation/internal/game/action"
-	_map "simulation/internal/game/map"
 	"simulation/internal/game/renderer"
 	"simulation/internal/game/renderer/glyph_set"
 	"simulation/internal/game/simulation"
+	"simulation/internal/game/world"
 )
 
 const (
@@ -16,7 +16,7 @@ const (
 )
 
 func main() {
-	worldMap := _map.New(DefaultWidth, DefaultHeight)
+	w := world.New(DefaultWidth, DefaultHeight)
 
 	initActions := []action.Action{
 		&action.SpawnAction{},
@@ -27,7 +27,7 @@ func main() {
 	}
 
 	r := renderer.NewConsoleRenderer(renderer.EmptyCellGlyph, glyph_set.NewEmojiGlyphSet())
-	s := simulation.New(&worldMap, DefaultDelayMs, r, initActions, turnActions)
+	s := simulation.New(&w, DefaultDelayMs, r, initActions, turnActions)
 	a := app.New(s)
 	a.Run()
 }

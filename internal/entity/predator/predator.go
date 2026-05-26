@@ -4,9 +4,9 @@ import (
 	"simulation/internal/entity"
 	"simulation/internal/entity/creature"
 	"simulation/internal/entity/herbivore"
-	_map "simulation/internal/game/map"
-	"simulation/internal/game/map/coordinate"
 	"simulation/internal/game/path"
+	"simulation/internal/game/world"
+	"simulation/internal/game/world/coordinate"
 )
 
 type Predator struct {
@@ -21,36 +21,36 @@ func New(hp, maxHp, speed, damage int) *Predator {
 	}
 }
 
-func (p *Predator) MakeMove(m *_map.Map) {
-	p.BaseCreature.PerformMove(p, m)
+func (p *Predator) MakeMove(w *world.World) {
+	p.BaseCreature.PerformMove(p, w)
 }
 
-func (p *Predator) HasAdjacentFood(m *_map.Map) bool {
-	_, _, exists := p.findAdjacentFood(m)
+func (p *Predator) HasAdjacentFood(w *world.World) bool {
+	_, _, exists := p.findAdjacentFood(w)
 	return exists
 }
 
-func (p *Predator) EatAdjacentFood(m *_map.Map) bool {
-	foodPosition, prey, exists := p.findAdjacentFood(m)
+func (p *Predator) EatAdjacentFood(w *world.World) bool {
+	foodPosition, prey, exists := p.findAdjacentFood(w)
 	if !exists {
 		return false
 	}
 
 	prey.TakeDamage(p.damage)
 	if !prey.IsAlive() {
-		m.RemoveEntity(foodPosition)
+		w.RemoveEntity(foodPosition)
 	}
 
 	return true
 }
 
-func (p *Predator) IsFoodAdjacent(m *_map.Map, c coordinate.Point) bool {
-	for _, neighbor := range path.GetNeighbors(c) {
-		if !m.IsValid(neighbor) {
+func (p *Predator) IsFoodAdjacent(w *world.World, point coordinate.Point) bool {
+	for _, neighbor := range path.GetNeighbors(point) {
+		if !w.IsValid(neighbor) {
 			continue
 		}
 
-		e := m.Get(neighbor.X, neighbor.Y)
+		e := w.Get(neighbor.X, neighbor.Y)
 		if e == nil {
 			continue
 		}
@@ -63,14 +63,14 @@ func (p *Predator) IsFoodAdjacent(m *_map.Map, c coordinate.Point) bool {
 	return false
 }
 
-func (p *Predator) findAdjacentFood(m *_map.Map) (coordinate.Point, creature.Creature, bool) {
-	currentPosition := m.GetCoordinatesByEntity(p)
+func (p *Predator) findAdjacentFood(w *world.World) (coordinate.Point, creature.Creature, bool) {
+	currentPosition := w.GetPointByEntity(p)
 	for _, neighbor := range path.GetNeighbors(currentPosition) {
-		if !m.IsValid(neighbor) {
+		if !w.IsValid(neighbor) {
 			continue
 		}
 
-		e := m.Get(neighbor.X, neighbor.Y)
+		e := w.Get(neighbor.X, neighbor.Y)
 		if e == nil || !isHerbivore(e) {
 			continue
 		}
