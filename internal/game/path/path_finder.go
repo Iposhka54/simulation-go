@@ -53,7 +53,7 @@ func Find(worldMap *_map.Map,
 
 func FindReachableNeighbors(worldMap *_map.Map,
 	position coordinate.Coordinate) []coordinate.Coordinate {
-	neighbors := getNeighbors(position)
+	neighbors := GetNeighbors(position)
 
 	filtered := neighbors[:0]
 
@@ -66,7 +66,7 @@ func FindReachableNeighbors(worldMap *_map.Map,
 	return filtered
 }
 
-func getNeighbors(position coordinate.Coordinate) []coordinate.Coordinate {
+func GetNeighbors(position coordinate.Coordinate) []coordinate.Coordinate {
 	var neighbors []coordinate.Coordinate
 
 	for _, dir := range directions {
