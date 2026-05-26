@@ -57,7 +57,7 @@ func (bc *BaseCreature) moveRandomly(m *_map.Map) {
 		m.PlaceEntity(neighbors[i], bc)
 		return
 	}
-	//need will log a situation where an entity cannot move
+	//todo need will log a situation where an entity cannot move
 }
 
 func (bc *BaseCreature) Hp() int {
