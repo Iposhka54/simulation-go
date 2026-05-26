@@ -38,6 +38,7 @@ func Find(worldMap *_map.Map,
 				continue
 			}
 
+			visited[neighbor] = true
 			parents[neighbor] = currentPosition
 
 			if foodChecker(worldMap, neighbor) {
