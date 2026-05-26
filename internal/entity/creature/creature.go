@@ -53,8 +53,9 @@ func (bc *BaseCreature) moveRandomly(m *_map.Map) {
 	if length >= 1 {
 		i := rand.Intn(length)
 		position := bc.getCurrentPosition(m)
+		movingEntity := m.Get(position.X, position.Y)
 		m.RemoveEntity(position)
-		m.PlaceEntity(neighbors[i], bc)
+		m.PlaceEntity(neighbors[i], movingEntity)
 		return
 	}
 	//todo need will log a situation where an entity cannot move
