@@ -37,8 +37,8 @@ func New(worldMap *_map.Map, delayMs int, render renderer.Renderer, initActions,
 	return simulation
 }
 
-// StartSimulation blocking operation, need invoke in a separate goroutine
-func (s *Simulation) StartSimulation() {
+// Start blocking operation, need invoke in a separate goroutine
+func (s *Simulation) Start() {
 	if s.running {
 		return
 	}
@@ -68,31 +68,31 @@ func (s *Simulation) StartSimulation() {
 		case <-s.pauseChan:
 			s.paused = true
 		case <-ticker.C:
-			s.NextTurn()
+			s.nextTurn()
 		}
 	}
 }
 
-func (s *Simulation) PauseSimulation() {
+func (s *Simulation) Pause() {
 	if s.running && !s.paused {
 		s.pauseChan <- struct{}{}
 	}
 }
 
-func (s *Simulation) ResumeSimulation() {
+func (s *Simulation) Resume() {
 	if s.running && s.paused {
 		s.pauseChan <- struct{}{}
 	}
 }
 
-func (s *Simulation) StopSimulation() {
+func (s *Simulation) Stop() {
 	if !s.running {
 		return
 	}
 	close(s.stopChan)
 }
 
-func (s *Simulation) NextTurn() {
+func (s *Simulation) nextTurn() {
 	s.turn++
 	for _, turnAction := range s.turnActions {
 		turnAction.Execute(s.worldMap)

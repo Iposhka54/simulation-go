@@ -31,11 +31,11 @@ func (a *App) Run() {
 
 	go a.handleSignals(sigChan)
 	go a.handleConsoleInput()
-	go a.simulation.StartSimulation()
+	go a.simulation.Start()
 
 	<-a.ctx.Done()
 
-	a.simulation.StopSimulation()
+	a.simulation.Stop()
 	println("Симуляция завершена!")
 }
 
@@ -61,10 +61,10 @@ func (a *App) handleConsoleInput() {
 			if scanner.Scan() {
 				switch scanner.Text() {
 				case "p":
-					a.simulation.PauseSimulation()
+					a.simulation.Pause()
 					fmt.Println("▶️ Пауза")
 				case "r":
-					a.simulation.ResumeSimulation()
+					a.simulation.Resume()
 					fmt.Println("▶️ Продолжение")
 				case "q":
 					fmt.Println("Выход...")
