@@ -1,6 +1,7 @@
 package action
 
 import (
+	"log"
 	"simulation/internal/entity/creature"
 	"simulation/internal/game/world"
 	"simulation/internal/game/world/coordinate"
@@ -25,7 +26,9 @@ func (ma *MoveAction) Execute(world *world.World) {
 			continue
 		}
 
-		cr.MakeMove(world)
+		if err := cr.MakeMove(world); err != nil {
+			log.Printf("creature ID %d failed to make move: %v\n", cr.ID(), err)
+		}
 	}
 }
 

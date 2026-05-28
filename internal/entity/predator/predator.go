@@ -21,27 +21,34 @@ func New(hp, maxHp, speed, damage int) *Predator {
 	}
 }
 
-func (p *Predator) MakeMove(w *world.World) {
-	p.BaseCreature.PerformMove(p, w)
+func (p *Predator) MakeMove(w *world.World) error {
+	return p.BaseCreature.PerformMove(p, w)
 }
 
-func (p *Predator) HasAdjacentFood(w *world.World) bool {
-	_, _, exists := p.findAdjacentFood(w)
-	return exists
+func (p *Predator) HasAdjacentFood(w *world.World) (bool, error) {
+	_, _, exists, err := p.findAdjacentFood(w)
+	return exists, err
 }
 
-func (p *Predator) EatAdjacentFood(w *world.World) bool {
-	foodPosition, prey, exists := p.findAdjacentFood(w)
+func (p *Predator) EatAdjacentFood(w *world.World) (bool, error) {
+	foodPosition, prey, exists, err := p.findAdjacentFood(w)
+
+	if err != nil {
+		return false, err
+	}
+
 	if !exists {
-		return false
+		return false, nil
 	}
 
 	prey.TakeDamage(p.damage)
 	if !prey.IsAlive() {
-		w.RemoveEntity(foodPosition)
+		if err = w.RemoveEntity(foodPosition); err != nil {
+			return false, err
+		}
 	}
 
-	return true
+	return true, nil
 }
 
 func (p *Predator) IsFoodAdjacent(w *world.World, point coordinate.Point) bool {
@@ -63,8 +70,12 @@ func (p *Predator) IsFoodAdjacent(w *world.World, point coordinate.Point) bool {
 	return false
 }
 
-func (p *Predator) findAdjacentFood(w *world.World) (coordinate.Point, creature.Creature, bool) {
-	currentPosition := w.GetPointByEntity(p)
+func (p *Predator) findAdjacentFood(w *world.World) (coordinate.Point, creature.Creature, bool, error) {
+	currentPosition, err := w.GetPointByEntity(p)
+	if err != nil {
+		return coordinate.Point{}, nil, false, err
+	}
+
 	for _, neighbor := range path.GetNeighbors(currentPosition) {
 		if !w.IsValid(neighbor) {
 			continue
@@ -80,10 +91,10 @@ func (p *Predator) findAdjacentFood(w *world.World) (coordinate.Point, creature.
 			continue
 		}
 
-		return neighbor, prey, true
+		return neighbor, prey, true, nil
 	}
 
-	return coordinate.Point{}, nil, false
+	return coordinate.Point{}, nil, false, nil
 }
 
 func isHerbivore(e entity.Entity) bool {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"simulation/internal/app"
 	"simulation/internal/game/action"
 	"simulation/internal/game/renderer"
@@ -16,7 +17,10 @@ const (
 )
 
 func main() {
-	w := world.New(DefaultWidth, DefaultHeight)
+	w, err := world.New(DefaultWidth, DefaultHeight)
+	if err != nil {
+		log.Fatalf("Critical initialization world error: %v", err)
+	}
 
 	initActions := []action.Action{
 		&action.SpawnAction{},
@@ -27,7 +31,7 @@ func main() {
 	}
 
 	r := renderer.NewConsoleRenderer(renderer.EmptyCellGlyph, glyph_set.NewEmojiGlyphSet())
-	s := simulation.New(&w, DefaultDelayMs, r, initActions, turnActions)
+	s := simulation.New(w, DefaultDelayMs, r, initActions, turnActions)
 	a := app.New(s)
 	a.Run()
 }

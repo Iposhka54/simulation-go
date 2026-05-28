@@ -1,6 +1,7 @@
 package creature
 
 import (
+	"fmt"
 	"math/rand"
 	"simulation/internal/entity"
 	"simulation/internal/game/path"
@@ -10,15 +11,15 @@ import (
 
 type Creature interface {
 	entity.Entity
-	MakeMove(w *world.World)
+	MakeMove(w *world.World) error
 	Hp() int
 	MaxHp() int
 	Speed() int
 	TakeDamage(damage int)
 	IsAlive() bool
-	Die(w *world.World)
-	HasAdjacentFood(w *world.World) bool
-	EatAdjacentFood(w *world.World) bool
+	Die(w *world.World) error
+	HasAdjacentFood(w *world.World) (bool, error)
+	EatAdjacentFood(w *world.World) (bool, error)
 	IsFoodAdjacent(w *world.World, c coordinate.Point) bool
 }
 
@@ -38,32 +39,41 @@ func New(hp, maxHp, speed int) *BaseCreature {
 	}
 }
 
-func (bc *BaseCreature) PerformMove(c Creature, w *world.World) {
+func (bc *BaseCreature) PerformMove(c Creature, w *world.World) error {
 	if !bc.IsAlive() {
-		bc.Die(w)
-		return
+		return bc.Die(w)
 	}
 
-	if c.HasAdjacentFood(w) {
-		if c.EatAdjacentFood(w) {
-			return
-		}
+	exists, err := c.HasAdjacentFood(w)
+	if err != nil {
+		return err
+	}
+	if exists {
+		_, err = c.EatAdjacentFood(w)
+		return err
 	}
 
-	p := path.Find(w, bc.getCurrentPosition(w), c.IsFoodAdjacent)
+	position, err := bc.getCurrentPosition(w)
+	if err != nil {
+		return err
+	}
+	p := path.Find(w, position, c.IsFoodAdjacent)
 
 	if len(p) > 1 {
-		bc.moveAlongPath(w, p)
-		return
+		return bc.moveAlongPath(w, p)
 	}
 
-	bc.moveRandomly(w)
+	if err = bc.moveRandomly(w); err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func (bc *BaseCreature) moveAlongPath(w *world.World, p []coordinate.Point) {
+func (bc *BaseCreature) moveAlongPath(w *world.World, p []coordinate.Point) error {
 	length := len(p)
 	if length <= 1 {
-		panic("Path must contain at least 2 positions")
+		return fmt.Errorf("path must contain at least 2 positions, actual: %d", length)
 	}
 
 	step := bc.speed
@@ -71,25 +81,40 @@ func (bc *BaseCreature) moveAlongPath(w *world.World, p []coordinate.Point) {
 		step = length - 1
 	}
 	newPosition := p[step]
-	bc.move(w, newPosition)
+	return bc.move(w, newPosition)
 }
 
-func (bc *BaseCreature) moveRandomly(w *world.World) {
-	neighbors := path.FindReachableNeighbors(w, bc.getCurrentPosition(w))
+func (bc *BaseCreature) moveRandomly(w *world.World) error {
+	position, err := bc.getCurrentPosition(w)
+	if err != nil {
+		return err
+	}
+	neighbors := path.FindReachableNeighbors(w, position)
 	length := len(neighbors)
 	if length >= 1 {
 		i := rand.Intn(length)
-		bc.move(w, neighbors[i])
-		return
+		return bc.move(w, neighbors[i])
 	}
 	//todo need will log a situation where an entity cannot move
+
+	return nil
 }
 
-func (bc *BaseCreature) move(w *world.World, newPosition coordinate.Point) {
-	position := bc.getCurrentPosition(w)
+func (bc *BaseCreature) move(w *world.World, newPosition coordinate.Point) error {
+	position, err := bc.getCurrentPosition(w)
+	if err != nil {
+		return err
+	}
+
 	movingEntity := w.Get(position.X, position.Y)
-	w.RemoveEntity(position)
-	w.PlaceEntity(newPosition, movingEntity)
+	if err = w.RemoveEntity(position); err != nil {
+		return err
+	}
+
+	if err = w.PlaceEntity(newPosition, movingEntity); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (bc *BaseCreature) Hp() int {
@@ -115,8 +140,13 @@ func (bc *BaseCreature) IsAlive() bool {
 	return bc.hp > 0
 }
 
-func (bc *BaseCreature) Die(w *world.World) {
-	w.RemoveEntity(bc.getCurrentPosition(w))
+func (bc *BaseCreature) Die(w *world.World) error {
+	position, err := bc.getCurrentPosition(w)
+	if err != nil {
+		return err
+	}
+
+	return w.RemoveEntity(position)
 }
 
 func (bc *BaseCreature) HasAdjacentFood(w *world.World) bool {
@@ -134,6 +164,6 @@ func (bc *BaseCreature) IsFoodAdjacent(w *world.World, p coordinate.Point) bool 
 	panic("implement in subclasses")
 }
 
-func (bc *BaseCreature) getCurrentPosition(w *world.World) coordinate.Point {
+func (bc *BaseCreature) getCurrentPosition(w *world.World) (coordinate.Point, error) {
 	return w.GetPointByEntity(bc)
 }

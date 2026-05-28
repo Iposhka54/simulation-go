@@ -1,9 +1,17 @@
 package world
 
 import (
+	"errors"
 	"fmt"
 	"simulation/internal/entity"
 	"simulation/internal/game/world/coordinate"
+)
+
+var (
+	ErrOutOfBounds     = errors.New("point are out of bounds")
+	ErrAlreadyOccupied = errors.New("cell is already occupied")
+	ErrCellEmpty       = errors.New("cannot remove entity because cell is empty")
+	ErrEntityNotFound  = errors.New("entity not found on the map")
 )
 
 type World struct {
@@ -18,23 +26,30 @@ type PositionedEntity struct {
 	Position coordinate.Point
 }
 
-func New(width, height int) World {
-	validateWorldSize(width, height)
-	return World{
+func New(width, height int) (*World, error) {
+	if err := validateWorldSize(width, height); err != nil {
+		return nil, err
+	}
+
+	return &World{
 		width:              width,
 		height:             height,
 		entitiesByPoints:   make(map[coordinate.Point]entity.Entity),
 		pointsByEntitiesID: make(map[uint64]coordinate.Point),
-	}
+	}, nil
 }
 
-func (w *World) PlaceEntity(p coordinate.Point, e entity.Entity) {
-	w.validate(p)
+func (w *World) PlaceEntity(p coordinate.Point, e entity.Entity) error {
+	if !w.IsValid(p) {
+		return fmt.Errorf("%w: %s for world %dx%d", ErrOutOfBounds, p.String(), w.width, w.height)
+	}
 	if !w.IsEmpty(p) {
-		panic(fmt.Sprintf("cell %s is already occupied", p.String()))
+		return fmt.Errorf("%w: %s", ErrAlreadyOccupied, p.String())
 	}
 	w.entitiesByPoints[p] = e
 	w.pointsByEntitiesID[e.ID()] = p
+
+	return nil
 }
 
 func (w *World) IsEmpty(c coordinate.Point) bool {
@@ -65,29 +80,32 @@ func (w *World) Get(x, y int) entity.Entity {
 	return e
 }
 
-func (w *World) GetPointByEntity(e entity.Entity) coordinate.Point {
+func (w *World) GetPointByEntity(e entity.Entity) (coordinate.Point, error) {
 	point, exists := w.pointsByEntitiesID[e.ID()]
 	if !exists {
-		panic(fmt.Sprintf("Entity %v not found on the world", e))
+		return coordinate.Point{}, fmt.Errorf("%w: ID %d", ErrEntityNotFound, e.ID())
 	}
-	return point
+	return point, nil
 }
 
 func (w *World) IsValid(c coordinate.Point) bool {
 	return c.X >= 0 && c.X < w.width && c.Y >= 0 && c.Y < w.height
 }
 
-func (w *World) RemoveEntity(p coordinate.Point) {
-	w.validate(p)
-
+func (w *World) RemoveEntity(p coordinate.Point) error {
+	if !w.IsValid(p) {
+		return fmt.Errorf("%w: %s for world %dx%d", ErrOutOfBounds, p.String(), w.width, w.height)
+	}
 	if w.IsEmpty(p) {
-		panic(fmt.Sprintf("Cannot remove entity from %s because this point is empty", p.String()))
+		return fmt.Errorf("%w: %s", ErrCellEmpty, p.String())
 	}
 
 	e := w.entitiesByPoints[p]
 
 	delete(w.entitiesByPoints, p)
 	delete(w.pointsByEntitiesID, e.ID())
+
+	return nil
 }
 
 func (w *World) GetPositionedEntities() []PositionedEntity {
@@ -103,15 +121,10 @@ func (w *World) GetPositionedEntities() []PositionedEntity {
 	return positioned
 }
 
-func (w *World) validate(p coordinate.Point) {
-	if w.IsValid(p) {
-		return
-	}
-	panic(fmt.Sprintf("%s are out of bounds for world %dx%d", p.String(), w.width, w.height))
-}
-
-func validateWorldSize(width, height int) {
+func validateWorldSize(width, height int) error {
 	if width <= 0 || height <= 0 {
-		panic(fmt.Sprintf("Invalid world size: width=%d, height=%d", width, height))
+		return fmt.Errorf("invalid world size: width=%d, height=%d", width, height)
 	}
+
+	return nil
 }
