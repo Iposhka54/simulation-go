@@ -62,7 +62,7 @@ func (a *App) handleConsoleInput() {
 				switch scanner.Text() {
 				case "p":
 					a.simulation.Pause()
-					fmt.Println("▶️ Пауза")
+					fmt.Println("⏸️ Пауза")
 				case "r":
 					a.simulation.Resume()
 					fmt.Println("▶️ Продолжение")
@@ -71,7 +71,7 @@ func (a *App) handleConsoleInput() {
 					a.cancel()
 					return
 				default:
-					fmt.Println("Неизвестная команда. Доступно: pause, resume, quit")
+					fmt.Println("Неизвестная команда. Доступно: p(pause), r(resume), q(quit)")
 				}
 			}
 		}
