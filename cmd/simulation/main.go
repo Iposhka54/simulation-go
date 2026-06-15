@@ -28,6 +28,7 @@ func main() {
 
 	turnActions := []action.Action{
 		&action.MoveAction{},
+		action.NewReplenishGrassAction(0.2, 3),
 	}
 
 	r := renderer.NewConsoleRenderer(renderer.EmptyCellGlyph, glyph_set.NewEmojiGlyphSet())
