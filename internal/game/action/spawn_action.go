@@ -1,6 +1,7 @@
 package action
 
 import (
+	"log"
 	"math/rand"
 	"simulation/internal/entity"
 	"simulation/internal/entity/herbivore"
@@ -65,7 +66,10 @@ func spawnUpTo(world *world.World, maxAttempts, entityCount int, spawner Spawner
 	for placed < entityCount && attempts < maxAttempts {
 		spawnPosition := coordinate.New(rand.Intn(world.Width()), rand.Intn(world.Height()))
 		if world.IsEmpty(spawnPosition) {
-			world.PlaceEntity(spawnPosition, spawner())
+			if err := world.PlaceEntity(spawnPosition, spawner()); err != nil {
+				log.Printf("spawn failed at %s: %v", spawnPosition.String(), err)
+				continue
+			}
 			placed++
 		}
 		attempts++
