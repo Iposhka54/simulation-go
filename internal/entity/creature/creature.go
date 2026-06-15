@@ -9,6 +9,8 @@ import (
 	"simulation/internal/game/world/coordinate"
 )
 
+const HungerPerTurn = 3
+
 type Creature interface {
 	entity.Entity
 	MakeMove(w *world.World) error
@@ -40,6 +42,7 @@ func New(hp, maxHp, speed int) *BaseCreature {
 }
 
 func (bc *BaseCreature) PerformMove(c Creature, w *world.World) error {
+	bc.TakeDamage(HungerPerTurn)
 	if !bc.IsAlive() {
 		return bc.Die(w)
 	}
