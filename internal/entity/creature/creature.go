@@ -152,21 +152,6 @@ func (bc *BaseCreature) Die(w *world.World) error {
 	return w.RemoveEntity(position)
 }
 
-func (bc *BaseCreature) HasAdjacentFood(w *world.World) bool {
-	_ = w
-	panic("implement in subclasses")
-}
-
-func (bc *BaseCreature) EatAdjacentFood(w *world.World) bool {
-	_ = w
-	panic("implement in subclasses")
-}
-
-func (bc *BaseCreature) IsFoodAdjacent(w *world.World, p coordinate.Point) bool {
-	_, _ = w, p
-	panic("implement in subclasses")
-}
-
 func (bc *BaseCreature) getCurrentPosition(w *world.World) (coordinate.Point, error) {
 	return w.GetPointByEntity(bc)
 }
