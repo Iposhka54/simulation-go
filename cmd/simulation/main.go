@@ -1,7 +1,10 @@
 package main
 
 import (
+	"context"
 	"log"
+	"os"
+	"os/signal"
 	"simulation/internal/app"
 	"simulation/internal/game/action"
 	"simulation/internal/game/renderer"
@@ -17,6 +20,8 @@ const (
 )
 
 func main() {
+	ctx := context.Background()
+	ctx, cancelFunc := signal.NotifyContext(ctx, os.Interrupt)
 	w, err := world.New(DefaultWidth, DefaultHeight)
 	if err != nil {
 		log.Fatalf("Critical initialization world error: %v", err)
@@ -33,6 +38,6 @@ func main() {
 
 	r := renderer.NewConsoleRenderer(renderer.EmptyCellGlyph, glyph_set.NewEmojiGlyphSet())
 	s := simulation.New(w, DefaultDelayMs, r, initActions, turnActions)
-	a := app.New(s)
-	a.Run()
+	a := app.New(cancelFunc, s)
+	a.Run(ctx)
 }

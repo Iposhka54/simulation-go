@@ -1,6 +1,7 @@
 package simulation
 
 import (
+	"context"
 	"simulation/internal/game/action"
 	"simulation/internal/game/renderer"
 	"simulation/internal/game/world"
@@ -15,9 +16,6 @@ type Simulation struct {
 	turnActions []action.Action
 	interval    time.Duration
 	pauseChan   chan struct{}
-	stopChan    chan struct{}
-	running     bool
-	paused      bool
 }
 
 func New(world *world.World, delayMs int, render renderer.Renderer, initActions, turnActions []action.Action) *Simulation {
@@ -29,67 +27,37 @@ func New(world *world.World, delayMs int, render renderer.Renderer, initActions,
 		turnActions: turnActions,
 		interval:    time.Duration(delayMs) * time.Millisecond,
 		pauseChan:   make(chan struct{}),
-		stopChan:    make(chan struct{}),
-		running:     false,
-		paused:      false,
 	}
 	simulation.init()
 	return simulation
 }
 
 // Start blocking operation, need invoke in a separate goroutine
-func (s *Simulation) Start() {
-	if s.running {
-		return
-	}
-
-	s.running = true
-	s.paused = false
-
+func (s *Simulation) Start(ctx context.Context) {
 	ticker := time.NewTicker(s.interval)
 	defer ticker.Stop()
-	for {
-		if s.paused {
-			select {
-			case <-s.pauseChan:
-				s.paused = false
-			case <-s.stopChan:
-				s.paused = false
-				s.running = false
-				return
-			}
-			continue
-		}
 
+	paused := false
+	for {
 		select {
-		case <-s.stopChan:
-			s.running = false
+		case <-ctx.Done():
 			return
 		case <-s.pauseChan:
-			s.paused = true
+			paused = !paused
 		case <-ticker.C:
-			s.nextTurn()
+			if !paused {
+				s.nextTurn()
+			}
 		}
 	}
 }
 
 func (s *Simulation) Pause() {
-	if s.running && !s.paused {
-		s.pauseChan <- struct{}{}
-	}
+	s.pauseChan <- struct{}{}
 }
 
 func (s *Simulation) Resume() {
-	if s.running && s.paused {
-		s.pauseChan <- struct{}{}
-	}
-}
-
-func (s *Simulation) Stop() {
-	if !s.running {
-		return
-	}
-	close(s.stopChan)
+	s.pauseChan <- struct{}{}
 }
 
 func (s *Simulation) nextTurn() {

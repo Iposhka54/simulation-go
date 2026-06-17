@@ -5,57 +5,45 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/signal"
 	"simulation/internal/game/simulation"
-	"syscall"
 )
 
 type App struct {
 	simulation *simulation.Simulation
-	ctx        context.Context
 	cancel     context.CancelFunc
 }
 
-func New(sim *simulation.Simulation) *App {
-	ctx, cancelFunc := context.WithCancel(context.Background())
+func New(cancel context.CancelFunc, sim *simulation.Simulation) *App {
 	return &App{
 		simulation: sim,
-		ctx:        ctx,
-		cancel:     cancelFunc,
+		cancel:     cancel,
 	}
 }
 
-func (a *App) Run() {
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+func (a *App) Run(ctx context.Context) {
+	go a.handleSignals(ctx)
+	go a.handleConsoleInput(ctx)
+	go a.simulation.Start(ctx)
 
-	go a.handleSignals(sigChan)
-	go a.handleConsoleInput()
-	go a.simulation.Start()
+	<-ctx.Done()
 
-	<-a.ctx.Done()
-
-	a.simulation.Stop()
 	println("Симуляция завершена!")
 }
 
-func (a *App) handleSignals(sigChan <-chan os.Signal) {
+func (a *App) handleSignals(ctx context.Context) {
 	select {
-	case <-a.ctx.Done():
-		return
-	case sig := <-sigChan:
-		println("Завершаем выполнение программы из-за сигнала: ", sig)
-		a.cancel()
+	case <-ctx.Done():
+		println("Завершаем выполнение программы!")
 	}
 }
 
-func (a *App) handleConsoleInput() {
+func (a *App) handleConsoleInput(ctx context.Context) {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	a.printStartMenu()
 	for {
 		select {
-		case <-a.ctx.Done():
+		case <-ctx.Done():
 			return
 		default:
 			if scanner.Scan() {
